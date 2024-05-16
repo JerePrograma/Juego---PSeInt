@@ -33,7 +33,7 @@ Proceso animacion
         Borrar Pantalla;
         
         // Mostrar el personaje y el movimiento hacia la derecha
-        Para j <- 0 Hasta 20 Hacer
+        Para j <- 0 Hasta 19 Hacer
             // Imprimir espacios en blanco para simular el movimiento hacia la derecha
             Para k <- 0 Hasta i Hacer
                 
