@@ -44,7 +44,7 @@ SubProceso mostrarLaberinto(tam, laberinto)
 FinSubProceso
 
 SubProceso definirParedes(tam, laberinto)
-	Definir descripcionLaberinto Como Caracter;
+    Definir descripcionLaberinto Como Caracter;
     Dimension descripcionLaberinto(10);
     descripcionLaberinto(0)<-"C XXXXXXXX";
     descripcionLaberinto(1)<-"X X      X";
@@ -67,16 +67,16 @@ FinSubProceso
 SubProceso seguimiento(tam, laberinto, estadoOriginal)
     Definir posX, posY, posXAnterior, posYAnterior Como Entero;
     Definir simboloJugador Como Caracter;
-	simboloJugador <- "J";
+    simboloJugador <- "J";
     Definir juegoActivo Como Logico;
-	juegoActivo <- Verdadero;
+    juegoActivo <- Verdadero;
     posX <- 0; posY <- 0;
 	
     Mientras juegoActivo Hacer
         posXAnterior <- posX;
         posYAnterior <- posY;
         presionar(posXAnterior, posYAnterior, posX, posY, simboloJugador, laberinto, tam);
-		
+        mostrarLaberinto(tam, laberinto);  // Asegurarse de que el laberinto se muestre antes de evaluar la posición.
         evaluarPosicion(tam, laberinto, estadoOriginal, posX, posY, posXAnterior, posYAnterior, simboloJugador, juegoActivo);
     FinMientras;
 FinSubProceso
@@ -91,7 +91,6 @@ SubProceso evaluarPosicion(tam, laberinto, estadoOriginal, posX, posY, posXAnter
         Sino
             laberinto(posXAnterior, posYAnterior) <- estadoOriginal(posXAnterior, posYAnterior);
             laberinto(posX, posY) <- simboloJugador;
-            mostrarLaberinto(tam, laberinto);
         FinSi;
     FinSi;
 FinSubProceso
@@ -163,18 +162,16 @@ FinSubProceso
 
 SubProceso mostrarMensaje(mensaje)
     Escribir "|¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯|";
-    Escribir "|", mensaje, rellenarEspacios(mensaje, 38), "|";
+    Escribir "| ", mensaje, rellenarEspacios(mensaje, 36), " |";
     Escribir "|______________________________________|";
 FinSubProceso
 
-SubProceso espacios <- rellenarEspacios(mensaje, totalEspacios) 
-	Definir espaciosNecesarios Como Entero;
-	Definir i Como Entero;
-espaciosNecesarios <- totalEspacios - Longitud(mensaje);
-Definir espacios Como Caracter;
-espacios <- "";
-Para i <- 1 Hasta espaciosNecesarios Hacer
-	espacios <- Concatenar(espacios, " ");
-FinPara
+SubProceso espacios <- rellenarEspacios(mensaje, totalEspacios)
+	Definir espaciosNecesarios, i Como Entero;
+	Definir espacios Como Caracter;
+	espaciosNecesarios <- totalEspacios - Longitud(mensaje);
+	espacios <- "";
+	Para i <- 1 Hasta espaciosNecesarios Hacer
+		espacios <- Concatenar(espacios, " ");
+    FinPara
 FinSubProceso
-
