@@ -211,6 +211,7 @@ SubProceso evaluarPosicion(tam, laberinto, estadoOriginal, posXNueva, posYNueva,
             FinSi;
         FinSi;
     FinSi;
+	Limpiar Pantalla;
 FinSubProceso
 
 // Incluimos una función para simular el lanzamiento de un dado de 6 caras
