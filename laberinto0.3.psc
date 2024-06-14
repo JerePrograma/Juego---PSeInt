@@ -20,7 +20,7 @@ FinProceso
 
 SubProceso iniciarJuego
     Definir nombre Como Caracter;
-    mostrarMensaje("Ingrese el nombre de su personaje para comenzar");
+	mostrarMensaje_ingresarNombre();
     Leer nombre;
     crearPersonaje(nombre);
 FinSubProceso
@@ -40,16 +40,6 @@ SubProceso inicializarEstadoOriginal(tam, laberinto, estadoOriginal)
         Para columna <- 0 Hasta tam-1 Hacer
             estadoOriginal(fila, columna) <- laberinto(fila, columna);
         FinPara
-    FinPara
-FinSubProceso
-
-SubProceso mostrarLaberinto(tam, laberinto)
-    Definir fila, columna Como Entero;
-    Para fila <- 0 Hasta tam-1 Hacer
-        Para columna <- 0 Hasta tam-1 Hacer
-            Escribir "[", laberinto(fila, columna), "] " Sin Saltar;
-        FinPara
-        Escribir " ";
     FinPara
 FinSubProceso
 
@@ -292,11 +282,54 @@ SubProceso statusPersonaje(nombre, vida, experiencia, fuerza, defensa, agilidad,
     Escribir "Estado: ", estado;
 FinSubProceso
 
-SubProceso mostrarMensaje(mensaje)
-    Escribir "|¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯|";
-    Escribir "| ", mensaje, rellenarEspacios(mensaje, 36), " |";
-    Escribir "|______________________________________|";
+SubProceso pelea
+	Escribir "Hola";
 FinSubProceso
+
+//*----------------------------------------------------*
+//*-------------------   PANTALLA   -------------------*
+//*----------------------------------------------------*
+
+//Imprime el mensaje ingresado dentro de un recuadro
+//El mensaje se ajustará a la cantidad de caracteres indicadas en longMensaje
+//El recuadro tiene una longitud de longMensaje + 4 ( = los 2 bordes + los 2 espacios de margen)
+SubProceso mostrarMensaje(mensaje)
+	Definir longMensaje, i Como Entero;
+	Definir techo, piso, palabras Como Caracter;
+	
+	longMensaje <- 38;
+	
+	techo <- "|-";
+	piso <- "|_";
+	Para i <- 1 Hasta longMensaje Con Paso 1 Hacer
+		techo <- Concatenar(techo, "-");
+		piso <- Concatenar(piso, "_");
+	FinPara
+	techo <- Concatenar(techo, "-|");
+	piso <- Concatenar(piso, "_|");
+	
+    Escribir techo;
+    Para i <- 0 Hasta Longitud(mensaje) Con Paso longMensaje hacer
+		palabras <- Subcadena(mensaje, i, i + longMensaje - 1);
+		escrituraMensaje(Subcadena(palabras, 0, longMensaje - 1), longMensaje);
+	FinPara
+    Escribir piso;
+FinSubProceso
+
+SubProceso escrituraMensaje(mensaje, tamanio)
+	Definir i como entero;
+	
+	Para i <- 0 Hasta tamanio - Longitud(mensaje) Con Paso 1 Hacer
+		mensaje <- Concatenar(mensaje, " ");
+	FinPara
+	
+	Escribir Sin Saltar "| ";
+	Para i <- 0 hasta tamanio-1 Con Paso 1 Hacer
+		Escribir Sin Saltar Subcadena(mensaje,i,i);
+	FinPara
+	Escribir " |";
+FinSubProceso
+
 Funcion espacios <- rellenarEspacios(mensaje, totalEspacios)
     Definir espaciosNecesarios, i Como Entero;
     Definir espacios Como Caracter;
@@ -306,6 +339,20 @@ Funcion espacios <- rellenarEspacios(mensaje, totalEspacios)
         espacios <- Concatenar(espacios, " ");
     FinPara
 FinFuncion
-SubProceso pelea
-	Escribir "Hola";
+
+Subproceso mostrarMensaje_ingresarNombre
+	Definir mensaje Como Caracter;
+	mensaje <-                    "Ingrese el nombre de su personaje     ";
+	mensaje <- Concatenar(mensaje,"para comenzar"                         );
+    mostrarMensaje(mensaje);
+FinSubProceso
+
+SubProceso mostrarLaberinto(tam, laberinto)
+    Definir fila, columna Como Entero;
+    Para fila <- 0 Hasta tam-1 Hacer
+        Para columna <- 0 Hasta tam-1 Hacer
+            Escribir "[", laberinto(fila, columna), "] " Sin Saltar;
+        FinPara
+        Escribir " ";
+    FinPara
 FinSubProceso
