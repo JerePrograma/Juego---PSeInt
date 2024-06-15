@@ -28,11 +28,9 @@ FinSubProceso
 ///*----------------------------------------------------*
 
 Proceso main
-	Definir tam, opcionMenu Como Entero;
-    Definir laberinto, estadoOriginal, estadoMenu Como Caracter;
-    Dimension laberinto(10,10);
-    Dimension estadoOriginal(10,10);
-    tam <- 10; // Tama?o del laberinto
+	Definir opcionMenu Como Entero;
+    Definir estadoMenu Como Caracter;
+    
     estadoMenu <- EST_INICIO();
 	Repetir
 		mostrarMensaje_menuInicio(estadoMenu);
