@@ -1,4 +1,4 @@
-Proceso BuscaHongos
+SubProceso BuscaHongos
 	
 	Dimension num[9,9];Dimension fan[9,9];
 	Definir num,fan,mina_pisada,num_minas_car como caracter;
@@ -10,12 +10,12 @@ Proceso BuscaHongos
 		Escribir "*******************************************************************";
 		Escribir "*******************************************************************";
 		Escribir "**************   BUSCA HONGOS DEL REINO OLVIDADO    ****************";	
-		Escribir     "**************   1. JUEGO NUEVO                ****************";
-		Escribir     "**************   2. SALIR                      ****************";
+		Escribir "**************        1. JUEGO NUEVO                ****************";
+		Escribir "**************        2. SALIR                      ****************";
 		Escribir "*******************************************************************";
 		Escribir "*******************************************************************";
+		Escribir "*****PARA JUGAR INGRESÁ LAS COORDENADAS (X primero, Y segundo)*****";
 		Leer opcion_numero;
-		
 		
 		Segun opcion_numero Hacer
 		1:
@@ -171,4 +171,4 @@ Proceso BuscaHongos
 		FinSegun
 		
 Hasta Que opcion_numero=2
-FinProceso
+FinSubProceso
