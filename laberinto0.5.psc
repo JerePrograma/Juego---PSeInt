@@ -209,7 +209,7 @@ SubProceso seguimiento(nombre Por Referencia, vida Por Referencia, experiencia P
         
         // Verificar y actualizar la posición
         Si posXNueva <> posX O posYNueva <> posY Entonces  // Si hay un cambio de posición
-            evaluarPosicion(tam, laberinto, estadoOriginal, posXNueva, posYNueva, posX, posY, simboloJugador, juegoActivo, vidaEnemigos, fuerzaEnemigos, defensaEnemigos, agilidadEnemigos, inteligenciaEnemigos);
+            evaluarPosicion(tam, laberinto, estadoOriginal, posXNueva, posYNueva, posX, posY, simboloJugador, juegoActivo);
             Si juegoActivo Entonces
                 // Actualizar las posiciones antiguas y nuevas
                 posX <- posXNueva;
@@ -303,7 +303,7 @@ SubProceso presionar(estadoAccion Por Referencia, posX, posY, posXNueva Por Refe
     FinSegun
 FinSubProceso
 
-SubProceso evaluarPosicion(tam, laberinto, estadoOriginal, posXNueva, posYNueva, posX, posY, simboloJugador, juegoActivo Por Referencia, vidaEnemigos, fuerzaEnemigos, defensaEnemigos, agilidadEnemigos, inteligenciaEnemigos)
+SubProceso evaluarPosicion(tam, laberinto, estadoOriginal, posXNueva, posYNueva, posX, posY, simboloJugador, juegoActivo Por Referencia)
     Si laberinto(posXNueva, posYNueva) = "X" Entonces
         mostrarMensaje("¡Hay una pared aquí!");
         posXNueva <- posX; // Revertir el movimiento
@@ -312,8 +312,9 @@ SubProceso evaluarPosicion(tam, laberinto, estadoOriginal, posXNueva, posYNueva,
         Si laberinto(posXNueva, posYNueva) = "E" Entonces
             mostrarMensaje("¡Un enemigo! Prepárate para luchar");
             Esperar 2 Segundos;
-            pelea;
-            laberinto(posXNueva, posYNueva) <- " "; // Eliminar el enemigo y dejar un espacio vacío
+            pelea();
+            laberinto(posX, posY) <- estadoOriginal(posX, posY); // Actualizar la posición anterior del jugador
+            laberinto(posXNueva, posYNueva) <- simboloJugador; // Mover el jugador a la nueva posición
             estadoOriginal(posXNueva, posYNueva) <- " "; // Actualizar estadoOriginal
         Sino
             Si laberinto(posXNueva, posYNueva) = "[" Entonces
@@ -321,14 +322,13 @@ SubProceso evaluarPosicion(tam, laberinto, estadoOriginal, posXNueva, posYNueva,
                 mostrarMensaje("¡Llegaste, descansa en esta hoguera guerrero!");
                 juegoActivo <- Falso;
             Sino
-                laberinto(posX, posY) <- estadoOriginal(posX, posY);
-                laberinto(posXNueva, posYNueva) <- simboloJugador;
+                laberinto(posX, posY) <- estadoOriginal(posX, posY); // Actualizar la posición anterior del jugador
+                laberinto(posXNueva, posYNueva) <- simboloJugador; // Mover el jugador a la nueva posición
             FinSi;
         FinSi;
     FinSi;
     Limpiar Pantalla;
 FinSubProceso
-
 
 
 // Incluimos una función para simular el lanzamiento de un dado de 6 caras
