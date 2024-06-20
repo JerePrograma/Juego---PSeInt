@@ -36,14 +36,6 @@ Proceso main
     Definir opcionMenu Como Entero;
     Definir estadoMenu Como Caracter;
     
-    // Declaración de matrices globales para enemigos
-    Definir vidaEnemigos, fuerzaEnemigos, defensaEnemigos, agilidadEnemigos, inteligenciaEnemigos Como Entero;
-    Dimension vidaEnemigos(20, 20);
-    Dimension fuerzaEnemigos(20, 20);
-    Dimension defensaEnemigos(20, 20);
-    Dimension agilidadEnemigos(20, 20);
-    Dimension inteligenciaEnemigos(20, 20);
-	
     estadoMenu <- "0000";
     Repetir
         mostrarMensaje_menuInicio(estadoMenu);
@@ -51,7 +43,7 @@ Proceso main
         Limpiar Pantalla;
         Segun opcionMenu Hacer
             1: // INICIAR JUEGO
-                juego(vidaEnemigos, fuerzaEnemigos, defensaEnemigos, agilidadEnemigos, inteligenciaEnemigos);
+                juego();
                 
             2: // SALIR
                 Escribir "Saliste sape";
@@ -68,7 +60,7 @@ FinProceso
 //---------------------   JUEGO   --------------------
 //----------------------------------------------------
 
-SubProceso juego(vidaEnemigos, fuerzaEnemigos, defensaEnemigos, agilidadEnemigos, inteligenciaEnemigos)
+SubProceso juego
     //Datos Personaje:
     Definir vida, experiencia, fuerza, defensa, nivel, agilidad, inteligencia Como Entero;
     Definir nombre, estado Como Caracter;
@@ -84,13 +76,13 @@ SubProceso juego(vidaEnemigos, fuerzaEnemigos, defensaEnemigos, agilidadEnemigos
     inicializarEstadoOriginal(tamLaberinto, laberinto, estadoOriginal);
     
     // Inicializar enemigos en el laberinto
-    colocarEnemigosAleatorios(tamLaberinto, laberinto, estadoOriginal, vidaEnemigos, fuerzaEnemigos, defensaEnemigos, agilidadEnemigos, inteligenciaEnemigos, 3); // Colocar 3 enemigos aleatorios
+    colocarEnemigosAleatorios(tamLaberinto, laberinto, estadoOriginal, 3); // Colocar 3 enemigos aleatorios
     
     // Mostrar el laberinto
     mostrarLaberinto(tamLaberinto, laberinto);
     
     creacionPersonaje(nombre, vida, experiencia, fuerza, defensa, agilidad, inteligencia, nivel, estado);
-    seguimiento(nombre, vida, experiencia, fuerza, defensa, agilidad, inteligencia, nivel, estado, tamLaberinto, laberinto, estadoOriginal, vidaEnemigos, fuerzaEnemigos, defensaEnemigos, agilidadEnemigos, inteligenciaEnemigos);
+    seguimiento(nombre, vida, experiencia, fuerza, defensa, agilidad, inteligencia, nivel, estado, tamLaberinto, laberinto, estadoOriginal);
 FinSubProceso
 
 
@@ -146,7 +138,7 @@ SubProceso inicializarEstadoOriginal(tam, laberinto, estadoOriginal)
     FinPara
 FinSubProceso
 
-SubProceso colocarEnemigosAleatorios(tam, laberinto, estadoOriginal, vidaEnemigos, fuerzaEnemigos, defensaEnemigos, agilidadEnemigos, inteligenciaEnemigos, cantidadEnemigos)
+SubProceso colocarEnemigosAleatorios(tam, laberinto, estadoOriginal, cantidadEnemigos)
     Definir enemigoPosX, enemigoPosY Como Entero;
     Definir contador Como Entero;
     contador <- 0;
@@ -156,6 +148,7 @@ SubProceso colocarEnemigosAleatorios(tam, laberinto, estadoOriginal, vidaEnemigo
         Si laberinto(enemigoPosX, enemigoPosY) = " " Entonces
             laberinto(enemigoPosX, enemigoPosY) <- "E";
             estadoOriginal(enemigoPosX, enemigoPosY) <- " "; // Actualizar el estadoOriginal con un espacio
+            inicializarEnemigo(enemigoPosX, enemigoPosY); // Inicializar las características del enemigo
             contador <- contador + 1;
         FinSi
     FinMientras
@@ -197,7 +190,7 @@ FinSubProceso
 //--------------------  EJECUCION  -------------------
 //----------------------------------------------------
 
-SubProceso seguimiento(nombre Por Referencia, vida Por Referencia, experiencia Por Referencia, fuerza Por Referencia, defensa Por Referencia, agilidad Por Referencia, inteligencia Por Referencia, nivel Por Referencia, estado Por Referencia, tam, laberinto, estadoOriginal, vidaEnemigos, fuerzaEnemigos, defensaEnemigos, agilidadEnemigos, inteligenciaEnemigos)
+SubProceso seguimiento(nombre Por Referencia, vida Por Referencia, experiencia Por Referencia, fuerza Por Referencia, defensa Por Referencia, agilidad Por Referencia, inteligencia Por Referencia, nivel Por Referencia, estado Por Referencia, tam, laberinto, estadoOriginal)
     Definir posX, posY, posXNueva, posYNueva Como Entero;
     Definir simboloJugador, estadoAccion Como Caracter;
     Definir juegoActivo Como Logico;
@@ -219,7 +212,7 @@ SubProceso seguimiento(nombre Por Referencia, vida Por Referencia, experiencia P
         
         // Verificar y actualizar la posición
         Si posXNueva <> posX O posYNueva <> posY Entonces  // Si hay un cambio de posición
-            evaluarPosicion(tam, laberinto, estadoOriginal, posXNueva, posYNueva, posX, posY, simboloJugador, juegoActivo, vidaEnemigos, fuerzaEnemigos, defensaEnemigos, agilidadEnemigos, inteligenciaEnemigos);
+            evaluarPosicion(tam, laberinto, estadoOriginal, posXNueva, posYNueva, posX, posY, simboloJugador, juegoActivo);
             Si juegoActivo Entonces
                 // Actualizar las posiciones antiguas y nuevas
                 posX <- posXNueva;
@@ -313,7 +306,7 @@ SubProceso presionar(estadoAccion Por Referencia, posX, posY, posXNueva Por Refe
     FinSegun
 FinSubProceso
 
-SubProceso evaluarPosicion(tam, laberinto, estadoOriginal, posXNueva, posYNueva, posX, posY, simboloJugador, juegoActivo Por Referencia, vidaEnemigos, fuerzaEnemigos, defensaEnemigos, agilidadEnemigos, inteligenciaEnemigos)
+SubProceso evaluarPosicion(tam, laberinto, estadoOriginal, posXNueva, posYNueva, posX, posY, simboloJugador, juegoActivo Por Referencia)
     Si laberinto(posXNueva, posYNueva) = "X" Entonces
         mostrarMensaje("¡Hay una pared aquí!");
         posXNueva <- posX; // Revertir el movimiento
@@ -322,7 +315,7 @@ SubProceso evaluarPosicion(tam, laberinto, estadoOriginal, posXNueva, posYNueva,
         Si laberinto(posXNueva, posYNueva) = "E" Entonces
             mostrarMensaje("¡Un enemigo! Prepárate para luchar");
             Esperar 2 Segundos;
-            pelea;
+            pelea(posXNueva, posYNueva); // Pasar las coordenadas del enemigo a la función de combate
             laberinto(posXNueva, posYNueva) <- " "; // Eliminar el enemigo y dejar un espacio vacío
             estadoOriginal(posXNueva, posYNueva) <- " "; // Actualizar estadoOriginal
         Sino
@@ -384,30 +377,51 @@ Funcion value <- ajustarAtributo(value)
     FinSi
 FinFuncion
 
-SubProceso pelea
+SubProceso pelea(posXNueva, posYNueva)
     Definir vidaEnemigo, fuerzaEnemigo, defensaEnemigo, agilidadEnemigo, inteligenciaEnemigo Como Entero;
-	
+	Dimension vidaEnemigos(20, 20);
+	Dimension fuerzaEnemigos(20, 20);
+	Dimension defensaEnemigos(20, 20);
+	Dimension agilidadEnemigos(20, 20);
+	Dimension inteligenciaEnemigos(20, 20);
     // Obtener las características del enemigo
-    inicializarEnemigo(vidaEnemigo, fuerzaEnemigo, defensaEnemigo, agilidadEnemigo, inteligenciaEnemigo);
-    
+    vidaEnemigo <- vidaEnemigos(posXNueva, posYNueva);
+    fuerzaEnemigo <- fuerzaEnemigos(posXNueva, posYNueva);
+    defensaEnemigo <- defensaEnemigos(posXNueva, posYNueva);
+    agilidadEnemigo <- agilidadEnemigos(posXNueva, posYNueva);
+    inteligenciaEnemigo <- inteligenciaEnemigos(posXNueva, posYNueva);
+	
     // Simulación del combate (aquí puedes agregar la lógica del combate)
+    Escribir "¡Un enemigo aparece!";
     Escribir "Vida del enemigo: ", vidaEnemigo;
-    
+    Escribir "Fuerza del enemigo: ", fuerzaEnemigo;
+    Escribir "Defensa del enemigo: ", defensaEnemigo;
+    Escribir "Agilidad del enemigo: ", agilidadEnemigo;
+    Escribir "Inteligencia del enemigo: ", inteligenciaEnemigo;
+	
     // Aquí agregar la lógica del combate
-    Esperar 2 Segundos;
-    ---------------------------CONTINUAR ACÁ------------------------
+    Escribir "¡Prepárate para luchar!";
+    Esperar 1 Segundos;
+	
+    // Ejemplo de combate (simple, puede ser más complejo)
     Si vidaEnemigo <= 0 Entonces
         Escribir "¡Has derrotado al enemigo!";
     FinSi
 FinSubProceso
 
 
-SubProceso inicializarEnemigo(vidaEnemigo Por Referencia, fuerzaEnemigo Por Referencia, defensaEnemigo Por Referencia, agilidadEnemigo Por Referencia, inteligenciaEnemigo Por Referencia)
-    vidaEnemigo <- 10 + Aleatorio(0, 10);
-    fuerzaEnemigo <- Aleatorio(1, 5);
-    defensaEnemigo <- Aleatorio(1, 5);
-    agilidadEnemigo <- Aleatorio(1, 5);
-    inteligenciaEnemigo <- Aleatorio(1, 5);
+SubProceso inicializarEnemigo(fila, columna)
+	Definir vidaEnemigos, fuerzaEnemigos, defensaEnemigos, agilidadEnemigos, inteligenciaEnemigos Como Entero;
+	Dimension vidaEnemigos(20, 20);
+	Dimension fuerzaEnemigos(20, 20);
+	Dimension defensaEnemigos(20, 20);
+	Dimension agilidadEnemigos(20, 20);
+	Dimension inteligenciaEnemigos(20, 20);
+    vidaEnemigos(fila, columna) <- 10 + Aleatorio(0, 10);
+    fuerzaEnemigos(fila, columna) <- Aleatorio(1, 5);
+    defensaEnemigos(fila, columna) <- Aleatorio(1, 5);
+    agilidadEnemigos(fila, columna) <- Aleatorio(1, 5);
+    inteligenciaEnemigos(fila, columna) <- Aleatorio(1, 5);
 FinSubProceso
 
 

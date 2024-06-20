@@ -1,65 +1,74 @@
-///----------------------------------------------------
-///------------------ CONSTANTES ------------------
-///----------------------------------------------------
+//----------------------------------------------------
+//------------------   CONSTANTES   ------------------
+//----------------------------------------------------
 
 SubProceso ESTADO_INICIAL <- obtenerEstadoInicial
-	Definir ESTADO_INICIAL Como Caracter;
-	ESTADO_INICIAL <- "0000";
+    Definir ESTADO_INICIAL Como Caracter;
+    ESTADO_INICIAL <- "0000";
 FinSubProceso
 
 SubProceso ESTADO_TECLA_INVALIDA <- obtenerEstadoTeclaInvalida
-	Definir ESTADO_TECLA_INVALIDA Como Caracter;
-	ESTADO_TECLA_INVALIDA <- "0001";
+    Definir ESTADO_TECLA_INVALIDA Como Caracter;
+    ESTADO_TECLA_INVALIDA <- "0001";
 FinSubProceso
 
 SubProceso ESTADO_MOVIMIENTO_INVALIDO <- obtenerEstadoMovimientoInvalido
-	Definir ESTADO_MOVIMIENTO_INVALIDO Como Caracter;
-	ESTADO_MOVIMIENTO_INVALIDO <- "0002";
+    Definir ESTADO_MOVIMIENTO_INVALIDO Como Caracter;
+    ESTADO_MOVIMIENTO_INVALIDO <- "0002";
 FinSubProceso
 
 SubProceso ESTADO_COLISION_PARED <- obtenerEstadoColisionPared
-	Definir ESTADO_COLISION_PARED Como Caracter;
-	ESTADO_COLISION_PARED <- "0003";
+    Definir ESTADO_COLISION_PARED Como Caracter;
+    ESTADO_COLISION_PARED <- "0003";
 FinSubProceso
 
 SubProceso ESTADO_MOSTRAR_ESTADISTICAS <- obtenerEstadoMostrarEstadisticas
-	Definir ESTADO_MOSTRAR_ESTADISTICAS Como Caracter;
-	ESTADO_MOSTRAR_ESTADISTICAS <- "0004";
+    Definir ESTADO_MOSTRAR_ESTADISTICAS Como Caracter;
+    ESTADO_MOSTRAR_ESTADISTICAS <- "0004";
 FinSubProceso
 
-///----------------------------------------------------
-///--------------------- INICIO ---------------------
-///----------------------------------------------------
+
+//----------------------------------------------------
+//---------------------  INICIO  ---------------------
+//----------------------------------------------------
 
 Proceso main
     Definir opcionMenu Como Entero;
     Definir estadoMenu Como Caracter;
-
-    estadoMenu <- obtenerEstadoInicial;
+    
+    // Declaración de matrices globales para enemigos
+    Definir vidaEnemigos, fuerzaEnemigos, defensaEnemigos, agilidadEnemigos, inteligenciaEnemigos Como Entero;
+    Dimension vidaEnemigos(20, 20);
+    Dimension fuerzaEnemigos(20, 20);
+    Dimension defensaEnemigos(20, 20);
+    Dimension agilidadEnemigos(20, 20);
+    Dimension inteligenciaEnemigos(20, 20);
+	
+    estadoMenu <- "0000";
     Repetir
         mostrarMensaje_menuInicio(estadoMenu);
         Leer opcionMenu;
         Limpiar Pantalla;
         Segun opcionMenu Hacer
             1: // INICIAR JUEGO
-                juego();
+                juego(vidaEnemigos, fuerzaEnemigos, defensaEnemigos, agilidadEnemigos, inteligenciaEnemigos);
                 
             2: // SALIR
                 Escribir "Saliste sape";
                 
             De Otro Modo: // TECLA INCORRECTA
-                estadoMenu <- obtenerEstadoTeclaInvalida;
+                estadoMenu <- "0001";
         FinSegun
         
     Hasta que opcionMenu = 2;
     
 FinProceso
 
-///*----------------------------------------------------*
-///*---------------------   JUEGO   --------------------*
-///*----------------------------------------------------*
+//----------------------------------------------------
+//---------------------   JUEGO   --------------------
+//----------------------------------------------------
 
-SubProceso juego
+SubProceso juego(vidaEnemigos, fuerzaEnemigos, defensaEnemigos, agilidadEnemigos, inteligenciaEnemigos)
     //Datos Personaje:
     Definir vida, experiencia, fuerza, defensa, nivel, agilidad, inteligencia Como Entero;
     Definir nombre, estado Como Caracter;
@@ -75,22 +84,23 @@ SubProceso juego
     inicializarEstadoOriginal(tamLaberinto, laberinto, estadoOriginal);
     
     // Inicializar enemigos en el laberinto
-    colocarEnemigosAleatorios(tamLaberinto, laberinto, 3); // Colocar 3 enemigos aleatorios
+    colocarEnemigosAleatorios(tamLaberinto, laberinto, estadoOriginal, vidaEnemigos, fuerzaEnemigos, defensaEnemigos, agilidadEnemigos, inteligenciaEnemigos, 3); // Colocar 3 enemigos aleatorios
     
     // Mostrar el laberinto
     mostrarLaberinto(tamLaberinto, laberinto);
     
     creacionPersonaje(nombre, vida, experiencia, fuerza, defensa, agilidad, inteligencia, nivel, estado);
-    seguimiento(nombre, vida, experiencia, fuerza, defensa, agilidad, inteligencia, nivel, estado, tamLaberinto, laberinto, estadoOriginal);
+    seguimiento(nombre, vida, experiencia, fuerza, defensa, agilidad, inteligencia, nivel, estado, tamLaberinto, laberinto, estadoOriginal, vidaEnemigos, fuerzaEnemigos, defensaEnemigos, agilidadEnemigos, inteligenciaEnemigos);
 FinSubProceso
 
 
-///*----------------------------------------------------*
-///*-------------  INICIALIZAR LABERINTO  --------------*
-///*----------------------------------------------------*
+//----------------------------------------------------
+//-------------  INICIALIZAR LABERINTO  --------------
+//----------------------------------------------------
 
 SubProceso inicializarLaberinto(tam, laberinto)
-    Definir tamLaberinto, n Como Entero;
+    Definir tamLaberinto Como Entero;
+    Definir n Como Entero;
     tamLaberinto <- tam; // Usar el parámetro tam pasado al subproceso
     poblarLaberinto(tamLaberinto, laberinto);
     
@@ -113,9 +123,6 @@ SubProceso inicializarLaberinto(tam, laberinto)
     laberinto((tamLaberinto-1)-1,(tamLaberinto-1)) <- " ";
     laberinto((tamLaberinto-1)-1,(tamLaberinto-1)-1) <- " ";
     
-    // Marcar la posición final del laberinto
-    laberinto(19,19) <- "[";
-    
     poblarLaberintoEnemigos(tamLaberinto, laberinto);
     
     mostrarLaberinto(tamLaberinto, laberinto);
@@ -128,6 +135,8 @@ SubProceso inicializarLaberinto(tam, laberinto)
     FinSi
 FinSubProceso
 
+
+
 SubProceso inicializarEstadoOriginal(tam, laberinto, estadoOriginal)
     Definir fila, columna Como Entero;
     Para fila <- 0 Hasta tam-1 Hacer
@@ -137,22 +146,25 @@ SubProceso inicializarEstadoOriginal(tam, laberinto, estadoOriginal)
     FinPara
 FinSubProceso
 
-SubProceso colocarEnemigosAleatorios(tam, laberinto, cantidadEnemigos)
-    Definir enemigoPosX, enemigoPosY, contador Como Entero;
+SubProceso colocarEnemigosAleatorios(tam, laberinto, estadoOriginal, vidaEnemigos, fuerzaEnemigos, defensaEnemigos, agilidadEnemigos, inteligenciaEnemigos, cantidadEnemigos)
+    Definir enemigoPosX, enemigoPosY Como Entero;
+    Definir contador Como Entero;
     contador <- 0;
     Mientras contador < cantidadEnemigos Hacer
         enemigoPosX <- lanzarDado(0, tam-1);
         enemigoPosY <- lanzarDado(0, tam-1);
         Si laberinto(enemigoPosX, enemigoPosY) = " " Entonces
             laberinto(enemigoPosX, enemigoPosY) <- "E";
+            estadoOriginal(enemigoPosX, enemigoPosY) <- " "; // Actualizar el estadoOriginal con un espacio
             contador <- contador + 1;
         FinSi
     FinMientras
 FinSubProceso
 
-///*----------------------------------------------------*
-///*---------------  CREACION PERSONAJE  ---------------*
-///*----------------------------------------------------*
+
+//----------------------------------------------------
+//---------------  CREACION PERSONAJE  ---------------
+//----------------------------------------------------
 
 SubProceso creacionPersonaje(nombre Por Referencia, vida Por Referencia, experiencia Por Referencia, fuerza Por Referencia, defensa Por Referencia, agilidad Por Referencia, inteligencia Por Referencia, nivel Por Referencia, estado Por Referencia)
     mostrarMensaje_ingresarNombre();
@@ -181,18 +193,17 @@ SubProceso inicializarEstadisticas(nombre Por Referencia, vida Por Referencia, e
     
 FinSubProceso
 
-///*----------------------------------------------------*
-///*--------------------  EJECUCION  -------------------*
-///*----------------------------------------------------*
+//----------------------------------------------------
+//--------------------  EJECUCION  -------------------
+//----------------------------------------------------
 
-SubProceso seguimiento(nombre Por Referencia, vida Por Referencia, experiencia Por Referencia, fuerza Por Referencia, defensa Por Referencia, agilidad Por Referencia, inteligencia Por Referencia, nivel Por Referencia, estado Por Referencia, tam, laberinto, estadoOriginal)
+SubProceso seguimiento(nombre Por Referencia, vida Por Referencia, experiencia Por Referencia, fuerza Por Referencia, defensa Por Referencia, agilidad Por Referencia, inteligencia Por Referencia, nivel Por Referencia, estado Por Referencia, tam, laberinto, estadoOriginal, vidaEnemigos, fuerzaEnemigos, defensaEnemigos, agilidadEnemigos, inteligenciaEnemigos)
     Definir posX, posY, posXNueva, posYNueva Como Entero;
     Definir simboloJugador, estadoAccion Como Caracter;
     Definir juegoActivo Como Logico;
-        
     simboloJugador <- "J";
     juegoActivo <- Verdadero;
-    estadoAccion <- obtenerEstadoInicial;
+    estadoAccion <- "0000";
     
     posX <- 0; posY <- 0;  // Asumiendo que el jugador empieza en la esquina superior izquierda
     laberinto(posX, posY) <- simboloJugador;  // Colocamos al jugador en la posición inicial
@@ -208,14 +219,14 @@ SubProceso seguimiento(nombre Por Referencia, vida Por Referencia, experiencia P
         
         // Verificar y actualizar la posición
         Si posXNueva <> posX O posYNueva <> posY Entonces  // Si hay un cambio de posición
-            evaluarPosicion(tam, laberinto, estadoOriginal, posXNueva, posYNueva, posX, posY, simboloJugador, juegoActivo);
+            evaluarPosicion(tam, laberinto, estadoOriginal, posXNueva, posYNueva, posX, posY, simboloJugador, juegoActivo, vidaEnemigos, fuerzaEnemigos, defensaEnemigos, agilidadEnemigos, inteligenciaEnemigos);
             Si juegoActivo Entonces
                 // Actualizar las posiciones antiguas y nuevas
                 posX <- posXNueva;
                 posY <- posYNueva;
             FinSi
-        SiNo
-            Si estadoAccion = obtenerEstadoTeclaInvalida Entonces
+        Sino
+            Si estadoAccion = "0004" Entonces
                 mostrarMensaje_estadisticasPersonaje(nombre, vida, experiencia, fuerza, defensa, agilidad, inteligencia, nivel, estado);
                 Escribir "Presione una tecla para continuar";
                 Esperar Tecla;
@@ -228,20 +239,19 @@ SubProceso presionar(estadoAccion Por Referencia, posX, posY, posXNueva Por Refe
     Definir eleccionLetra, direccion Como Caracter;
     Definir eleccionNumero Como Entero;
     
-    
     mostrarMensaje_accionesMapa(estadoAccion);
     Leer eleccionLetra;
     
     eleccionLetra <- Minusculas(eleccionLetra);
     Si      eleccionLetra = "a" Entonces
         eleccionNumero <- 1;
-    SiNo Si eleccionLetra = "s" Entonces
+    Sino Si eleccionLetra = "s" Entonces
             eleccionNumero <- 2;
-        SiNo Si eleccionLetra = "d" Entonces
+        Sino Si eleccionLetra = "d" Entonces
                 eleccionNumero <- 3;
-            SiNo Si eleccionLetra = "w" Entonces
+            Sino Si eleccionLetra = "w" Entonces
                     eleccionNumero <- 4;
-                SiNo Si eleccionLetra = "e" Entonces
+                Sino Si eleccionLetra = "e" Entonces
                         eleccionNumero <- 5;
                     Sino
                         eleccionNumero <- -1; // Invalid
@@ -250,60 +260,60 @@ SubProceso presionar(estadoAccion Por Referencia, posX, posY, posXNueva Por Refe
             FinSi
         FinSi
     FinSi
-	
+    
     Segun eleccionNumero Hacer
         1:  // Izquierda
             Si posY > 0 Entonces
                 Si laberinto(posX, posY - 1) <> "X" Entonces
                     posYNueva <- posY - 1;
-                    estadoAccion <- obtenerEstadoInicial;
+                    estadoAccion <- "0000";
                 Sino
-                    estadoAccion <- obtenerEstadoColisionPared;
+                    estadoAccion <- "0003";
                 FinSi
             Sino
-                estadoAccion <- obtenerEstadoMovimientoInvalido;
+                estadoAccion <- "0002";
             FinSi
         2:  // Abajo
             Si posX < tam - 1 Entonces
                 Si laberinto(posX + 1, posY) <> "X" Entonces
                     posXNueva <- posX + 1;
-                    estadoAccion <- obtenerEstadoInicial;
+                    estadoAccion <- "0000";
                 Sino
-                    estadoAccion <- obtenerEstadoColisionPared;
+                    estadoAccion <- "0003";
                 FinSi
             Sino
-                estadoAccion <- obtenerEstadoMovimientoInvalido;
+                estadoAccion <- "0002";
             FinSi
         3:  // Derecha
             Si posY < tam - 1 Entonces
                 Si laberinto(posX, posY + 1) <> "X" Entonces
                     posYNueva <- posY + 1;
-                    estadoAccion <- obtenerEstadoInicial;
+                    estadoAccion <- "0000";
                 Sino
-                    estadoAccion <- obtenerEstadoColisionPared;
+                    estadoAccion <- "0003";
                 FinSi
             Sino
-                estadoAccion <- obtenerEstadoMovimientoInvalido;
+                estadoAccion <- "0002";
             FinSi
         4:  // Arriba
             Si posX > 0 Entonces
                 Si laberinto(posX - 1, posY) <> "X" Entonces
                     posXNueva <- posX - 1;
-                    estadoAccion <- obtenerEstadoInicial;
+                    estadoAccion <- "0000";
                 Sino
-                    estadoAccion <- obtenerEstadoColisionPared;
+                    estadoAccion <- "0003";
                 FinSi
             Sino
-                estadoAccion <- obtenerEstadoMovimientoInvalido;
+                estadoAccion <- "0002";
             FinSi
         5:
-            estadoAccion <- obtenerEstadoMostrarEstadisticas;
+            estadoAccion <- "0004";
         De Otro Modo:
-            estadoAccion <- obtenerEstadoTeclaInvalida;
+            estadoAccion <- "0001";
     FinSegun
 FinSubProceso
 
-SubProceso evaluarPosicion(tam, laberinto, estadoOriginal, posXNueva, posYNueva, posX, posY, simboloJugador, juegoActivo Por Referencia)
+SubProceso evaluarPosicion(tam, laberinto, estadoOriginal, posXNueva, posYNueva, posX, posY, simboloJugador, juegoActivo Por Referencia, vidaEnemigos, fuerzaEnemigos, defensaEnemigos, agilidadEnemigos, inteligenciaEnemigos)
     Si laberinto(posXNueva, posYNueva) = "X" Entonces
         mostrarMensaje("¡Hay una pared aquí!");
         posXNueva <- posX; // Revertir el movimiento
@@ -313,11 +323,11 @@ SubProceso evaluarPosicion(tam, laberinto, estadoOriginal, posXNueva, posYNueva,
             mostrarMensaje("¡Un enemigo! Prepárate para luchar");
             Esperar 2 Segundos;
             pelea;
-            laberinto(posX, posY) <- " ";
-            laberinto(posXNueva, posYNueva) <- simboloJugador;
+            laberinto(posXNueva, posYNueva) <- " "; // Eliminar el enemigo y dejar un espacio vacío
+            estadoOriginal(posXNueva, posYNueva) <- " "; // Actualizar estadoOriginal
         Sino
             Si laberinto(posXNueva, posYNueva) = "[" Entonces
-                BuscaHongos;
+                BuscaHongos();
                 mostrarMensaje("¡Llegaste, descansa en esta hoguera guerrero!");
                 juegoActivo <- Falso;
             Sino
@@ -328,6 +338,8 @@ SubProceso evaluarPosicion(tam, laberinto, estadoOriginal, posXNueva, posYNueva,
     FinSi;
     Limpiar Pantalla;
 FinSubProceso
+
+
 
 // Incluimos una función para simular el lanzamiento de un dado de 6 caras
 Funcion enteroAleatorio <- lanzarDado(minimo,maximo)
@@ -341,10 +353,10 @@ Funcion suma <- sumaTresMayoresD6
     Definir menor, suma Como Entero;
     
     // Lanzamos cuatro dados
-    dado1 <- lanzarDado(1,6);
-    dado2 <- lanzarDado(1,6);
-    dado3 <- lanzarDado(1,6);
-    dado4 <- lanzarDado(1,6);
+    dado1 <- lanzarDado(0,6);
+    dado2 <- lanzarDado(0,6);
+    dado3 <- lanzarDado(0,6);
+    dado4 <- lanzarDado(0,6);
     
     // Encontramos el menor de los cuatro lanzamientos
     menor <- dado1;
@@ -367,186 +379,43 @@ Funcion value <- ajustarAtributo(value)
     Si value < 0 Entonces
         value <- 0;
     Sino Si value > 20 Entonces
-			value <- 20;
-		FinSi
-	FinSi
-	
+            value <- 20;
+        FinSi
+    FinSi
 FinFuncion
 
 SubProceso pelea
-    Escribir "Hola";
+    Definir vidaEnemigo, fuerzaEnemigo, defensaEnemigo, agilidadEnemigo, inteligenciaEnemigo Como Entero;
+	
+    // Obtener las características del enemigo
+    inicializarEnemigo(vidaEnemigo, fuerzaEnemigo, defensaEnemigo, agilidadEnemigo, inteligenciaEnemigo);
+    
+    // Simulación del combate (aquí puedes agregar la lógica del combate)
+    Escribir "Vida del enemigo: ", vidaEnemigo;
+    
+    // Aquí agregar la lógica del combate
+    Esperar 2 Segundos;
+    ---------------------------CONTINUAR ACÁ------------------------
+    Si vidaEnemigo <= 0 Entonces
+        Escribir "¡Has derrotado al enemigo!";
+    FinSi
 FinSubProceso
 
-SubProceso BuscaHongos
-    Dimension num[9,9], fan[9,9];
-    Definir mina_pisada, num_minas_car, opcion_letra Como Caracter;
-    Definir salir, retirada Como Caracter;
-    Definir num_minas, op, fil, col, i, j, xe, ye, verificar, varX, varY, busX, busY, marX, marY, nivel, opc Como Entero;
-    Definir juegoHongos Como Logico;
-    juegoHongos <- Verdadero;
-    retirada <- '';
-    Repetir
-        Limpiar Pantalla;
-        Escribir "********************************************************************";
-        Escribir "********************************************************************";
-        Escribir "************     BUSCA HONGOS DEL REINO OLVIDADO      **************";    
-        Escribir "************ FELICIDADES JUGADOR, SUPERASTE ESTE MAPA **************";
-        Escribir "***  PARA PASAR AL PRÓXIMO DEBERÁS PASAR POR UN CAMPO DE HONGOS  ***";
-        Escribir "************** PRESIONE CUALQUIER TECLA PARA CONTINUAR **************";
-        Escribir "********************************************************************";
-        Leer opcion_letra;
-        
-        
-        Repetir
-            Limpiar Pantalla;
-            Escribir "**************  NIVEL    ";
-            Escribir "**************  1. FACIL [5 hongos]  ";
-            Escribir "**************  2. INTERMEDIO [10 hongos]    ";
-            Escribir "**************  3. DIFICIL  [15 hongos]  ";
-            Leer opc;
-            Segun opc Hacer
-                1:
-                    nivel <- 5;
-                2:
-                    nivel <- 10;
-                3:
-                    nivel <- 15;
-                De Otro Modo:
-                    Escribir "Opción no válida";
-            FinSegun
-        Hasta Que opc >= 1 Y opc <= 3
-        
-        num_minas <- 0;
-        op <- 1;
-        Para fil <- 0 Hasta 7 Hacer
-            Para col <- 0 Hasta 7 Hacer
-                num[fil,col] <- "-";
-                fan[fil,col] <- "-";
-            FinPara
-        FinPara
-        
-        // UBICACION DE HONGOS AL AZAR
-        Para i <- 1 Hasta nivel Hacer
-            xe <- Azar(6) + 1;
-            ye <- Azar(6) + 1;
-            Si num[xe,ye] = "-" Entonces
-                num[xe,ye] <- "X";
-            Sino
-                i <- i - 1;
-            FinSi
-        FinPara
-        
-        Repetir                    
-            // VERIFICAR SI HAY HONGOS
-            verificar <- 0;
-            Para fil <- 1 Hasta 7 Hacer
-                Para col <- 1 Hasta 7 Hacer
-                    Si fan[fil,col] = "-" Entonces
-                        verificar <- 1;
-                    FinSi
-                FinPara
-            FinPara
-            Si verificar = 0 Entonces
-                Escribir "_______________________________________________";
-                Escribir "¡Has encontrado todos los hongos!";
-                Escribir "¡GANASTE!"; retirada <- "s";
-                Esperar Tecla;
-            FinSi
-            
-            Limpiar Pantalla;
-            
-            Escribir "---------------------------------";
-            Escribir "       1   2   3   4   5   6    ";
-            
-            Escribir 1,"    | ",fan[1,1]," | ",fan[1,2]," | ",fan[1,3]," | ",fan[1,4]," | ",fan[1,5]," | ",fan[1,6]," | ";
-            Escribir 2,"    | ",fan[2,1]," | ",fan[2,2]," | ",fan[2,3]," | ",fan[2,4]," | ",fan[2,5]," | ",fan[2,6]," |      *Marcar Hongo Presione [10]";
-            Escribir 3,"    | ",fan[3,1]," | ",fan[3,2]," | ",fan[3,3]," | ",fan[3,4]," | ",fan[3,5]," | ",fan[3,6]," |        Después tecla [enter]";
-            Escribir 4,"    | ",fan[4,1]," | ",fan[4,2]," | ",fan[4,3]," | ",fan[4,4]," | ",fan[4,5]," | ",fan[4,6]," |      *Retirada presione [11]";
-            Escribir 5,"    | ",fan[5,1]," | ",fan[5,2]," | ",fan[5,3]," | ",fan[5,4]," | ",fan[5,5]," | ",fan[5,6]," |        Después tecla [enter]";
-            Escribir 6,"    | ",fan[6,1]," | ",fan[6,2]," | ",fan[6,3]," | ",fan[6,4]," | ",fan[6,5]," | ",fan[6,6]," | ";
-            Escribir "**********************************";
-            Escribir "***** PARA JUGAR INGRESÁ LAS COORDENADAS (X primero, Y segundo) *****";
-            
-            Escribir "Coordenada en  X";
-            Leer varX;
-            Escribir "Coordenada en  Y";
-            Leer varY;
-            
-            Si varX >= 1 Y varY >= 1 Y varX <= 7 Y varY <= 7 Entonces
-                mina_pisada <- num[varY,varX];
-                
-                Si mina_pisada <> "X" Entonces
-                    
-                    Repetir                    
-                        busX <- varX;
-                        busY <- varY;
-                        Segun op Hacer
-                            1:
-                                busX <- busX - 1;
-                            2:
-                                busX <- busX - 1; busY <- busY - 1;
-                            3:
-                                busY <- busY - 1;
-                            4:
-                                busX <- busX + 1; busY <- busY - 1;
-                            5:
-                                busX <- busX + 1;
-                            6:
-                                busX <- busX + 1; busY <- busY + 1;
-                            7:
-                                busY <- busY + 1;
-                            8:
-                                busX <- busX - 1; busY <- busY + 1;
-                            De Otro Modo:
-                                Escribir "Error: Terminando escaneo Hongos";
-                        FinSegun
-                        op <- op + 1;
-                        Si num[busY,busX] = 'X' Entonces
-                            num_minas <- num_minas + 1;
-                        FinSi
-                        
-                    Hasta Que op = 9
-                    num_minas_car <- ConvertirATexto(num_minas);
-                    fan[varY,varX] <- num_minas_car;
-                    op <- 1; num_minas <- 0;
-                Sino
-                    Limpiar Pantalla;
-                    Escribir "       1   2   3   4   5   6   ";
-                    Para j <- 1 Hasta 6 Hacer
-                        Escribir j,"     | ",num[j,1]," | ",num[j,2]," | ",num[j,3]," | ",num[j,4]," | ",num[j,5]," | ",num[j,6]," | ";
-                    FinPara
-                    
-                    Escribir "*************************************";
-                    Escribir "HAS PISADO UN HONGO Amanita phalloides, ¡ES MORTAL!";
-                    Escribir "GAME OVER";
-                    Escribir "YOU DEAD, in game!!!";
-                    Esperar Tecla;
-                    retirada <- "s";
-                FinSi
-            Sino Si varX = 11 O varY = 11 Entonces
-                    Escribir "¿Estás seguro que quieres retirarte del Juego?[S/N]";
-                    Leer retirada;
-                Sino Si varX = 10 O varY = 10 Entonces
-                        Escribir "Digite coordenada X de hongo que desea marcar";
-                        Leer marX;
-                        Escribir "Digite coordenada Y de hongo que desea marcar";
-                        Leer marY;
-                        fan[marY,marX] <- "?";
-                    FinSi
-					
-                FinSi
-                
-            FinSi
-            
-        Hasta Que retirada = 's' O retirada = 'S'
-        retirada <- '';
-        juegoHongos <- Falso;
-    Hasta Que juegoHongos = Falso;
+
+SubProceso inicializarEnemigo(vidaEnemigo Por Referencia, fuerzaEnemigo Por Referencia, defensaEnemigo Por Referencia, agilidadEnemigo Por Referencia, inteligenciaEnemigo Por Referencia)
+    vidaEnemigo <- 10 + Aleatorio(0, 10);
+    fuerzaEnemigo <- Aleatorio(1, 5);
+    defensaEnemigo <- Aleatorio(1, 5);
+    agilidadEnemigo <- Aleatorio(1, 5);
+    inteligenciaEnemigo <- Aleatorio(1, 5);
 FinSubProceso
 
-///*----------------------------------------------------*
-///*-------------------   PANTALLA   -------------------*
-///*----------------------------------------------------*
+
+
+
+//----------------------------------------------------
+//-------------------   PANTALLA   -------------------
+//----------------------------------------------------
 
 //Imprime el mensaje ingresado dentro de un recuadro
 //El mensaje se ajustará a la cantidad de caracteres indicadas en longMensaje
@@ -559,7 +428,7 @@ SubProceso mostrarMensaje(mensaje)
     
     techo <- "|-";
     piso <- "|_";
-    Para i <- 1 Hasta longMensaje Hacer
+    Para i <- 1 Hasta longMensaje Con Paso 1 Hacer
         techo <- Concatenar(techo, "-");
         piso <- Concatenar(piso, "_");
     FinPara
@@ -567,7 +436,7 @@ SubProceso mostrarMensaje(mensaje)
     piso <- Concatenar(piso, "_|");
     
     Escribir techo;
-    Para i <- 0 Hasta Longitud(mensaje) - 1 Con Paso longMensaje Hacer
+    Para i <- 0 Hasta Longitud(mensaje) - 1 Con Paso longMensaje hacer
         palabras <- Subcadena(mensaje, i, i + longMensaje - 1);
         escrituraMensaje(Subcadena(palabras, 0, longMensaje - 1), longMensaje);
     FinPara
@@ -585,7 +454,7 @@ SubProceso mostrarMensajes(mensajes, cantidad)
     
     techo <- "|-";
     piso <- "|_";
-    Para i <- 1 Hasta longMensaje Hacer
+    Para i <- 1 Hasta longMensaje Con Paso 1 Hacer
         techo <- Concatenar(techo, "-");
         piso <- Concatenar(piso, "_");
     FinPara
@@ -593,42 +462,42 @@ SubProceso mostrarMensajes(mensajes, cantidad)
     piso <- Concatenar(piso, "_|");
     
     Escribir techo;
-    Para i <- 0 Hasta cantidad - 1 Hacer
+    Para i <- 0 Hasta cantidad - 1 Con Paso 1 hacer
         escrituraMensaje(Subcadena(mensajes[i],0,longMensaje), longMensaje);
     FinPara
     Escribir piso;
 FinSubProceso
 
-//Escribe el mensaje dentro del recuadro colocando saltos de línea en base al tamaño solicitado
+//Escribe el mensaje dentro del recuadro colocando saltos de linea en base al tamaño solicitado
 SubProceso escrituraMensaje(mensaje, tamanio)
-    Definir i Como Entero;
+    Definir i como entero;
     
-    Para i <- 0 Hasta tamanio - Longitud(mensaje) Hacer
+    Para i <- 0 Hasta tamanio - Longitud(mensaje) Con Paso 1 Hacer
         mensaje <- Concatenar(mensaje, " ");
     FinPara
     
     Escribir Sin Saltar "| ";
-    Para i <- 0 Hasta tamanio-1 Hacer
+    Para i <- 0 hasta tamanio-1 Con Paso 1 Hacer
         Escribir Sin Saltar Subcadena(mensaje,i,i);
     FinPara
     Escribir " |";
 FinSubProceso
 
-SubProceso mostrarMensaje_ingresarNombre
+Subproceso mostrarMensaje_ingresarNombre
     Definir mensaje Como Caracter;
-    mensaje <- "Ingrese el nombre de su personaje     ";
+    mensaje <-                    "Ingrese el nombre de su personaje     ";
     mensaje <- Concatenar(mensaje,"para comenzar"                         );
     mostrarMensaje(mensaje);
 FinSubProceso
 
-SubProceso mostrarMensaje_accionesMapa(estado)
+Subproceso mostrarMensaje_accionesMapa(estado)
     Definir mensaje Como Caracter;
     mensaje <- "";
     Si estado = "0001" Entonces
         mensaje <- "¡Opción inválida!                     ";
-    SiNo Si estado = "0002" Entonces
+    Sino Si estado = "0002" Entonces
             mensaje <- "¡Movimiento Inválido!                 ";
-        SiNo Si estado = "0003" Entonces
+        Sino Si estado = "0003" Entonces
                 mensaje <- "¡Una pared bloquea el paso!           ";
             FinSi
         FinSi
@@ -640,7 +509,7 @@ SubProceso mostrarMensaje_accionesMapa(estado)
     mostrarMensaje(mensaje);
 FinSubProceso
 
-SubProceso mostrarMensaje_menuInicio(estado)
+Subproceso mostrarMensaje_menuInicio(estado)
     ilustracionMenu();
     Definir mensaje Como Caracter;
     mensaje <- "";
@@ -815,7 +684,9 @@ SubProceso conectado <- esConectado(tam, laberinto)
 FinSubProceso
 
 SubProceso encontrado <- DFS(fila, columna, tam, laberinto, visitado)
-    Definir dx, dy, nx, ny, k Como Entero;
+    Definir dx, dy Como Entero;
+    Definir nx, ny Como Entero;
+    Definir k Como Entero;
     Dimension dx(4);
     Dimension dy(4);
     Definir encontrado Como Logico;
@@ -848,4 +719,175 @@ SubProceso encontrado <- DFS(fila, columna, tam, laberinto, visitado)
             FinSi
         FinPara
     FinSi
+FinSubProceso
+
+SubProceso BuscaHongos
+    
+    Dimension num[9,9];
+    Dimension fan[9,9];
+    Definir num,fan,mina_pisada,num_minas_car, opcion_letra como caracter;
+    Definir salir,retirada como caracter;
+    Definir num_minas,op,fil,col,i,j,xe,ye,verificar,varX,varY,busX,busY,marX,marY,nivel,opc como Entero;
+    Definir juegoHongos Como Logico;
+    juegoHongos <- Verdadero;
+    retirada<-'';
+    Repetir
+        limpiar pantalla;
+        Escribir "********************************************************************";
+        Escribir "********************************************************************";
+        Escribir "************     BUSCA HONGOS DEL REINO OLVIDADO      **************";    
+        Escribir "************ FELICIDADES JUGADOR, SUPERASTE ESTE MAPA **************";
+        Escribir "***  PARA PASAR AL PRÓXIMO DEBERÁS PASAR POR UN CAMPO DE HONGOS  ***";
+        Escribir "************** PRESIONE CUALQUIER TECLA PARA CONTINUAR **************";
+        Escribir "********************************************************************";
+        Leer opcion_letra;
+        
+        
+        Repetir
+            limpiar pantalla;
+            Escribir "**************  NIVEL    ";
+            Escribir "**************  1. FACIL [5 hongos]  ";
+            Escribir "**************  2. INTERMEDIO [10 hongos]    ";
+            Escribir "**************  3. DIFICIL  [15 hongos]  ";
+            Leer opc;
+            Segun opc Hacer
+                1:
+                    nivel<-5;
+                2:
+                    nivel<-10;
+                3:
+                    nivel<-15;
+                De Otro Modo:
+                    Escribir "Opcion no valida";
+            FinSegun
+        Hasta Que opc>=1 y opc<=3
+        
+        num_minas<-0;
+        op<-1;
+        para fil<-0 hasta 7 con paso 1 hacer
+            Para col<-0 Hasta 7 Con Paso 1 Hacer
+                num[fil,col]<-" ";
+                fan[fil,col]<-" ";
+            FinPara
+        finpara
+        
+        //UBICACION DE HONGOS AL AZAR
+        Para i<-1 Hasta nivel Con Paso 1 Hacer
+            xe <- azar(6)+1;
+            ye <- azar(6)+1;
+            si num[xe,ye]="-" entonces
+                num[xe,ye]<-"X";
+            Sino
+                i<-i-1;
+            finsi
+        FinPara
+        
+        Repetir                    
+            //VERIFICAR SI HAY HONGOS
+            verificar<-0;
+            para fil<-1 hasta 7 con paso 1 hacer
+                Para col<-1 Hasta 7 Con Paso 1 Hacer
+                    si fan[fil,col]="-" Entonces
+                        verificar<-1;
+                    FinSi
+                FinPara
+            finpara
+            si verificar=0 entonces
+                Escribir "_______________________________________________";
+                Escribir "Has encontrado todas los hongos!!";
+                Escribir "GANASTE!!"; retirada<-"s";
+                Esperar Tecla;
+            FinSi
+            
+            LimpiarPantalla;
+            
+            Escribir "---------------------------------";
+            Escribir "       1   2   3   4   5   6    ";
+            
+            Escribir 1,"    | ",fan[1,1]," | ",fan[1,2]," | ",fan[1,3]," | ",fan[1,4]," | ",fan[1,5]," | ",fan[1,6]," | ";
+            Escribir 2,"    | ",fan[2,1]," | ",fan[2,2]," | ",fan[2,3]," | ",fan[2,4]," | ",fan[2,5]," | ",fan[2,6]," |      *Marcar Hongo Presione [10]";
+            Escribir 3,"    | ",fan[3,1]," | ",fan[3,2]," | ",fan[3,3]," | ",fan[3,4]," | ",fan[3,5]," | ",fan[3,6]," |        Despues tecla [enter]";
+            Escribir 4,"    | ",fan[4,1]," | ",fan[4,2]," | ",fan[4,3]," | ",fan[4,4]," | ",fan[4,5]," | ",fan[4,6]," |      *Retirada presione [11]";
+            Escribir 5,"    | ",fan[5,1]," | ",fan[5,2]," | ",fan[5,3]," | ",fan[5,4]," | ",fan[5,5]," | ",fan[5,6]," |        Despues tecla [enter]";
+            Escribir 6,"    | ",fan[6,1]," | ",fan[6,2]," | ",fan[6,3]," | ",fan[6,4]," | ",fan[6,5]," | ",fan[6,6]," | ";
+            //Escribir 7,"    | ",fan[7,1]," | ",fan[7,2]," | ",fan[7,3]," | ",fan[7,4]," | ",fan[7,5]," | ",fan[7,6]," | ",fan[7,7]," | ";
+            Escribir "**********************************";
+            Escribir "***** PARA JUGAR INGRESÁ LAS COORDENADAS (X primero, Y segundo) *****";
+            
+            Escribir "Coordenada en  X";
+            Leer varX;
+            Escribir "Coordenada en  Y";
+            Leer varY;
+            
+            si varX>=1 y varY>=1 y varX<=7 y varY<=7 entonces
+                mina_pisada<-num[varY,varX];
+                
+                si !mina_pisada="X" entonces
+                    
+                    Repetir                    
+                        busX<-varX;
+                        busY<-varY;
+                        Segun op Hacer
+                            1:
+                                busX<-busX-1;
+                            2:
+                                busX<-busX-1;busY<-busY-1;
+                            3:
+                                busY<-busY-1;
+                            4:
+                                busX<-busX+1;busY<-busY-1;
+                            5:
+                                busX<-busX+1;
+                            6:
+                                busX<-busX+1;busY<-busY+1;
+                            7:
+                                busY<-busY+1;
+                            8:
+                                busX<-busX-1;busY<-busY+1;
+                            De Otro Modo:
+                                Escribir "Error: Terminando escaneo Hongos";
+                        FinSegun
+                        op<-op+1;
+                        si num[busY,busX]='X' Entonces
+                            num_minas <- num_minas+1;
+                        FinSi
+                        
+                        
+                    Hasta Que op=9
+                    num_minas_car<-ConvertirATexto(num_minas);
+                    fan[varY,varX]<- num_minas_car;
+                    op<-1;num_minas<-0;
+                Sino
+                    LimpiarPantalla;
+                    Escribir "       1   2   3   4   5   6   ";
+                    para j<-1 hasta 6 con paso 1 hacer
+                        Escribir j,"     | ",num[j,1]," | ",num[j,2]," | ",num[j,3]," | ",num[j,4]," | ",num[j,5]," | ",num[j,6]," | ";
+                    FinPara
+                    
+                    Escribir "*************************************";
+                    Escribir "HAS PISADO UN HONGO Amanita phalloides, SI ES MORTAL !!";
+                    Escribir "GAME OVER";
+                    Escribir "YOU DEAD, in game!!!";
+                    esperar tecla;
+                    retirada<-"s";
+                FinSi
+            Sino si varX=11 o varY=11 entonces
+                    Escribir "¿Estas seguro que quieres retirarte del Juego?[S/N]";
+                    leer retirada;
+                Sino si    varX=10 o varY=10 entonces
+                        Escribir "Digite cordenada X de hongo que desea marcar";
+                        Leer marX;
+                        Escribir "Digite cordenada Y de hongo que desea marcar";
+                        Leer marY;
+                        fan[marY,marX]<-"?";
+                    FinSi
+                    
+                FinSi
+                
+            FinSi
+            
+        Hasta Que retirada='s' o retirada='S'
+        retirada<-'';
+        juegoHongos <- Falso;
+    Hasta Que juegoHongos = Falso;
 FinSubProceso
