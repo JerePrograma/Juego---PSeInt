@@ -52,7 +52,7 @@ Proceso animacionFinal05
         // Espacios iniciales para mover el dragón hacia arriba
         espacios(altura);
         // Mostrar solo parte visible del dragón (líneas 0 a 25)
-        Para j <- 0 Hasta 25 Hacer
+        Para j <- 0 Hasta 39 Hacer
             Si j + altura < 40 Entonces
                 Escribir dragon[j + altura];
             FinSi
