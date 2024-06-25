@@ -51,19 +51,14 @@ Proceso Principal
 	Esperar Tecla;
 	Borrar Pantalla;
 	pantallaEleccionJuego();
-	
-    Definir opcionMenu Como Entero;
-    Definir estadoMenu Como Caracter;
-	
-    estadoMenu <- "0000";
-   
+  
 FinProceso
 
 //----------------------------------------------------
 //---------------------   JUEGO   --------------------
 //----------------------------------------------------
 
-SubProceso juego
+SubProceso juegoLaberinto
     //Datos Personaje:
     Definir vida, experiencia, fuerza, defensa, nivel, agilidad, inteligencia Como Entero;
     Definir nombre, estado Como Caracter;
@@ -79,13 +74,13 @@ SubProceso juego
     inicializarEstadoOriginal(tamLaberinto, laberinto, estadoOriginal);
     
     // Inicializar enemigos en el laberinto
-    colocarEnemigosAleatorios(tamLaberinto, laberinto, estadoOriginal); // Colocar 3 enemigos aleatorios
+    colocarEnemigosAleatorios(tamLaberinto, laberinto, estadoOriginal, 4); // Colocar 3 enemigos aleatorios
     
     // Mostrar el laberinto
     mostrarLaberinto(tamLaberinto, laberinto);
     
     creacionPersonaje(nombre, vida, experiencia, fuerza, defensa, agilidad, inteligencia, nivel, estado);
-    seguimiento(nombre, vida, experiencia, fuerza, defensa, agilidad, inteligencia, nivel, estado, tamLaberinto, laberinto, estadoOriginal, vidaEnemigos, fuerzaEnemigos, defensaEnemigos, agilidadEnemigos, inteligenciaEnemigos);
+    seguimiento(nombre, vida, experiencia, fuerza, defensa, agilidad, inteligencia, nivel, estado, tamLaberinto, laberinto, estadoOriginal);
 FinSubProceso
 
 
@@ -94,6 +89,7 @@ FinSubProceso
 //----------------------------------------------------
 
 SubProceso inicializarLaberinto(tam, laberinto)
+	
     Definir tamLaberinto Como Entero;
     Definir n Como Entero;
     tamLaberinto <- tam; // Usar el parámetro tam pasado al subproceso
@@ -101,7 +97,7 @@ SubProceso inicializarLaberinto(tam, laberinto)
     
     Escribir "Creando Mundo...";
     Escribir "";
-    
+    ilustracionMenu;
     Mientras no esConectado(tamLaberinto, laberinto) Hacer
         poblarLaberinto(tamLaberinto, laberinto);
         Para n <- 0 Hasta 4 Hacer
@@ -119,6 +115,7 @@ SubProceso inicializarLaberinto(tam, laberinto)
     laberinto((tamLaberinto-1)-1,(tamLaberinto-1)-1) <- " ";
     
     poblarLaberintoEnemigos(tamLaberinto, laberinto);
+	Borrar Pantalla;
 FinSubProceso
 
 SubProceso inicializarEstadoOriginal(tam, laberinto, estadoOriginal)
@@ -130,7 +127,7 @@ SubProceso inicializarEstadoOriginal(tam, laberinto, estadoOriginal)
     FinPara
 FinSubProceso
 
-SubProceso colocarEnemigosAleatorios(tam, laberinto, estadoOriginal)
+SubProceso colocarEnemigosAleatorios(tam, laberinto, estadoOriginal, cantidadEnemigos)
     Definir enemigoPosX, enemigoPosY Como Entero;
     Definir contador Como Entero;
     contador <- 0;
@@ -150,31 +147,31 @@ FinSubProceso
 //---------------  CREACION PERSONAJE  ---------------
 //----------------------------------------------------
 
-SubProceso creacionPersonaje(nombre Por Referencia, vida Por Referencia, experiencia Por Referencia, fuerza Por Referencia, defensa Por Referencia, agilidad Por Referencia, inteligencia Por Referencia, nivel Por Referencia, estado Por Referencia)
-    mostrarMensaje_ingresarNombre();
-    Leer nombre;
-    inicializarEstadisticas(nombre, vida, experiencia, fuerza, defensa, agilidad, inteligencia, nivel, estado);
-    mostrarMensaje_estadisticasPersonaje(nombre, vida, experiencia, fuerza, defensa, agilidad, inteligencia, nivel, estado);
+SubProceso creacionPersonaje(nombrePersonaje Por Referencia, vidaPersonaje Por Referencia, experienciaPersonaje Por Referencia, fuerzaPersonaje Por Referencia, defensaPersonaje Por Referencia, agilidadPersonaje Por Referencia, inteligenciaPersonaje Por Referencia, nivelPersonaje Por Referencia, estadoPersonaje Por Referencia)
+    mostrarMensajeIngresarNombre();
+    Leer nombrePersonaje;
+    inicializarEstadisticas(nombrePersonaje, vidaPersonaje, experienciaPersonaje, fuerzaPersonaje, defensaPersonaje, agilidadPersonaje, inteligenciaPersonaje, nivelPersonaje, estadoPersonaje);
+    mostrarMensajeEstadisticasPersonaje(nombrePersonaje, vidaPersonaje, experienciaPersonaje, fuerzaPersonaje, defensaPersonaje, agilidadPersonaje, inteligenciaPersonaje, nivelPersonaje, estadoPersonaje);
 	animacionPersonaje;
     Escribir "Presione una tecla para continuar";
     Esperar Tecla;
 FinSubProceso
 
 // Proceso principal para crear un personaje con atributos basados en D&D 5e 
-SubProceso inicializarEstadisticas(nombre Por Referencia, vida Por Referencia, experiencia Por Referencia, fuerza Por Referencia, defensa Por Referencia, agilidad Por Referencia, inteligencia Por Referencia, nivel Por Referencia, estado Por Referencia)
+SubProceso inicializarEstadisticas(nombrePersonaje, vidaPersonaje Por Referencia, experienciaPersonaje Por Referencia, fuerzaPersonaje Por Referencia, defensaPersonaje Por Referencia, agilidadPersonaje Por Referencia, inteligenciaPersonaje Por Referencia, nivelPersonaje Por Referencia, estadoPersonaje Por Referencia)
     
     // Inicializamos la vida y experiencia base
-    vida <- 10 + sumaTresMayoresD6(); // Base de 10 más bonificación
-    experiencia <- 0;
-    nivel <- 1;
-    estado <- "Normal";
+    vidaPersonaje <- 10 + sumaTresMayoresD6(); // Base de 10 más bonificación
+    experienciaPersonaje <- 0;
+    nivelPersonaje <- 1;
+    estadoPersonaje <- "Normal";
     
     // Ajustamos cada atributo con la suma de los tres mayores de 4d6
     // y aseguramos que estén en el rango de 0 a 20
-    fuerza <- ajustarAtributo(sumaTresMayoresD6());
-    defensa <- ajustarAtributo(sumaTresMayoresD6());
-    agilidad <- ajustarAtributo(sumaTresMayoresD6());
-    inteligencia <- ajustarAtributo(sumaTresMayoresD6());
+    fuerzaPersonaje <- ajustarAtributo(sumaTresMayoresD6());
+    defensaPersonaje <- ajustarAtributo(sumaTresMayoresD6());
+    agilidadPersonaje <- ajustarAtributo(sumaTresMayoresD6());
+    inteligenciaPersonaje <- ajustarAtributo(sumaTresMayoresD6());
     
 FinSubProceso
 
@@ -182,7 +179,7 @@ FinSubProceso
 //--------------------  EJECUCION  -------------------
 //----------------------------------------------------
 
-SubProceso seguimiento(nombre Por Referencia, vida Por Referencia, experiencia Por Referencia, fuerza Por Referencia, defensa Por Referencia, agilidad Por Referencia, inteligencia Por Referencia, nivel Por Referencia, estado Por Referencia, tam, laberinto, estadoOriginal, vidaEnemigos, fuerzaEnemigos, defensaEnemigos, agilidadEnemigos, inteligenciaEnemigos)
+SubProceso seguimiento(nombrePersonaje Por Referencia, vidaPersonaje Por Referencia, experienciaPersonaje Por Referencia, fuerzaPersonaje Por Referencia, defensaPersonaje Por Referencia, agilidadPersonaje Por Referencia, inteligenciaPersonaje Por Referencia, nivelPersonaje Por Referencia, estadoPersonaje Por Referencia, tam, laberinto, estadoOriginal)
     Definir posX, posY, posXNueva, posYNueva Como Entero;
     Definir simboloJugador, estadoAccion Como Caracter;
     Definir juegoActivo Como Logico;
@@ -204,7 +201,7 @@ SubProceso seguimiento(nombre Por Referencia, vida Por Referencia, experiencia P
         
         // Verificar y actualizar la posición
         Si posXNueva <> posX O posYNueva <> posY Entonces  // Si hay un cambio de posición
-            evaluarPosicion(tam, laberinto, estadoOriginal, posXNueva, posYNueva, posX, posY, simboloJugador, juegoActivo);
+            evaluarPosicion(tam, laberinto, estadoOriginal, posXNueva, posYNueva, posX, posY, simboloJugador, juegoActivo, nombrePersonaje, vidaPersonaje, experienciaPersonaje, fuerzaPersonaje, defensaPersonaje, agilidadPersonaje, inteligenciaPersonaje, nivelPersonaje, estadoPersonaje);
             Si juegoActivo Entonces
                 // Actualizar las posiciones antiguas y nuevas
                 posX <- posXNueva;
@@ -212,7 +209,7 @@ SubProceso seguimiento(nombre Por Referencia, vida Por Referencia, experiencia P
             FinSi
         Sino
             Si estadoAccion = "0004" Entonces
-                mostrarMensaje_estadisticasPersonaje(nombre, vida, experiencia, fuerza, defensa, agilidad, inteligencia, nivel, estado);
+                mostrarMensajeEstadisticasPersonaje(nombrePersonaje, vidaPersonaje, experienciaPersonaje, fuerzaPersonaje, defensaPersonaje, agilidadPersonaje, inteligenciaPersonaje, nivelPersonaje, estadoPersonaje);
                 Escribir "Presione una tecla para continuar";
                 Esperar Tecla;
             FinSi
@@ -224,7 +221,7 @@ SubProceso presionar(estadoAccion Por Referencia, posX, posY, posXNueva Por Refe
     Definir eleccionLetra, direccion Como Caracter;
     Definir eleccionNumero Como Entero;
     
-    mostrarMensaje_accionesMapa(estadoAccion);
+    mostrarMensajeAccionesMapa(estadoAccion);
     Leer eleccionLetra;
     
     eleccionLetra <- Minusculas(eleccionLetra);
@@ -298,7 +295,7 @@ SubProceso presionar(estadoAccion Por Referencia, posX, posY, posXNueva Por Refe
     FinSegun
 FinSubProceso
 
-SubProceso evaluarPosicion(tam, laberinto, estadoOriginal, posXNueva, posYNueva, posX, posY, simboloJugador, juegoActivo Por Referencia)
+SubProceso evaluarPosicion(tam, laberinto, estadoOriginal, posXNueva, posYNueva, posX, posY, simboloJugador, juegoActivo Por Referencia, nombrePersonaje, vidaPersonaje, experienciaPersonaje, fuerzaPersonaje, defensaPersonaje, agilidadPersonaje, inteligenciaPersonaje, nivelPersonaje, estadoPersonaje)
     Si laberinto(posXNueva, posYNueva) = "X" Entonces
         mostrarMensaje("¡Hay una pared aquí!");
         posXNueva <- posX; // Revertir el movimiento
@@ -307,7 +304,7 @@ SubProceso evaluarPosicion(tam, laberinto, estadoOriginal, posXNueva, posYNueva,
         Si laberinto(posXNueva, posYNueva) = "E" Entonces
             mostrarMensaje("¡Un enemigo! Prepárate para luchar");
             Esperar 2 Segundos;
-            pelea();
+            pelea(nombrePersonaje, vidaPersonaje, experienciaPersonaje, fuerzaPersonaje, defensaPersonaje, agilidadPersonaje, inteligenciaPersonaje, nivelPersonaje, estadoPersonaje);
             laberinto(posX, posY) <- estadoOriginal(posX, posY); // Actualizar la posición anterior del jugador
             laberinto(posXNueva, posYNueva) <- simboloJugador; // Mover el jugador a la nueva posición
             estadoOriginal(posXNueva, posYNueva) <- " "; // Actualizar estadoOriginal
@@ -368,22 +365,138 @@ Funcion value <- ajustarAtributo(value)
     FinSi
 FinFuncion
 
-SubProceso pelea
-    Definir vidaEnemigo, fuerzaEnemigo, defensaEnemigo, agilidadEnemigo, inteligenciaEnemigo Como Entero;
-	
+SubProceso pelea(nombrePersonaje, vidaPersonaje Por Referencia, experienciaPersonaje Por Referencia, fuerzaPersonaje Por Referencia, defensaPersonaje Por Referencia, agilidadPersonaje Por Referencia, inteligenciaPersonaje Por Referencia, nivelPersonaje Por Referencia, estadoPersonaje)
+    Definir vidaEnemigo, fuerzaEnemigo, defensaEnemigo, agilidadEnemigo, inteligenciaEnemigo, eleccionNumero, valorDadoPersonaje, valorDadoEnemigo, danioRecibidoPersonaje, danioAlEnemigo, danioRecibidoEnemigo, vidaMaximaPersonaje Como Entero;
+	Definir eleccion Como Caracter;
     // Obtener las características del enemigo
     inicializarEnemigo(vidaEnemigo, fuerzaEnemigo, defensaEnemigo, agilidadEnemigo, inteligenciaEnemigo);
-    
+    vidaMaximaPersonaje <- vidaPersonaje;
     // Simulación del combate (aquí puedes agregar la lógica del combate)
     Escribir "Vida del enemigo: ", vidaEnemigo;
-    
-    // Aquí agregar la lógica del combate
-    Esperar 1 Segundos;
-	vidaEnemigo <- 0;
-    Si vidaEnemigo <= 0 Entonces
-        Escribir "¡Has derrotado al enemigo!";
+    Mientras vidaEnemigo > 0 Y vidaPersonaje > 0 Hacer
+		danioRecibidoPersonaje <- 0;
+		danioRecibidoEnemigo <- 0;
+		danioAlEnemigo <- 0;
+		Repetir
+		mostrarMensajeAccionesPelea;
+		Leer eleccion;
+		Si eleccion = "a" O eleccion = "A" Entonces
+			eleccionNumero <- 1;
+		SiNo
+			Si eleccion = "d" O eleccion = "D" Entonces
+				eleccionNumero <- 2;
+			SiNo
+				Si eleccion = "e" O eleccion = "E" Entonces
+					eleccionNumero <- 3;
+				SiNo
+					eleccionNumero <- 4;
+				FinSi
+			FinSi
+		FinSi
+		valorDadoEnemigo <- lanzarDado(1,2);
+			Segun eleccionNumero Hacer
+				Caso 1: 
+					Escribir "Te posicionas para atacar al enemigo";				
+				Caso 2:
+					Escribir "Te posicionas para defenderte";
+				Caso 3:
+					mostrarMensajeEstadisticasPersonaje(nombrePersonaje, vidaPersonaje, experienciaPersonaje, fuerzaPersonaje, defensaPersonaje, agilidadPersonaje, inteligenciaPersonaje, nivelPersonaje, estadoPersonaje);
+				Caso 4:
+					Escribir "Opción no válida! Ingrese nuevamente";
+			FinSegun
+			Esperar 2 Segundos;
+		Hasta Que eleccionNumero = 1 O eleccionNumero = 2;
 		Esperar 1 Segundos;
-    FinSi
+		Si valorDadoEnemigo = 1 Entonces
+			Escribir "El enemigo se posiciona para atacarte!";
+		SiNo
+			Escribir "El se pone en postura defensiva!";
+		FinSi
+		Si eleccionNumero = 2 Y valorDadoEnemigo = 2 Entonces
+			Escribir "Los dos se quedan mirando en postura de defenza";
+		SiNo
+			Si eleccionNumero = 1 Y valorDadoEnemigo = 2 Entonces
+				valorDadoPersonaje <- lanzarDadoAnimacion;
+				Si valorDadoPersonaje = 1 Entonces
+					Escribir "Te tropezaste y te atacaste solo";
+					Escribir "Te haces ", fuerzaPersonaje * 10 / 100, " de daño";
+					vidaPersonaje <- vidaPersonaje - trunc((fuerzaPersonaje * 10 / 100));
+				SiNo
+					Si valorDadoPersonaje < 3 Entonces 
+						Escribir "Fallaste! Sacaste un ", valorDadoPersonaje;
+					SiNo
+						Si valorDadoPersonaje = 6 Entonces
+							Escribir "Lo atacas con una furia desenfrenada!! Le haces 200% de tu daño!";
+							danioAlEnemigo <- fuerzaPersonaje * 2;
+						SiNo
+							Escribir "Lo atacas! Sacaste un ", valorDadoPersonaje, ", le haces el ", (valorDadoPersonaje - 1) * 20, "% de tu daño";
+							danioAlEnemigo <- fuerzaPersonaje * ((valorDadoPersonaje - 1) * 20 / 100);
+						FinSi
+						valorDadoEnemigo <- lanzarDadoAnimacion;
+						Si valorDadoEnemigo < 3 Entonces 
+							Escribir "El enemigo no se defiende! Queda al descubierto, sacó un ", valorDadoEnemigo;
+						SiNo
+							Escribir "El enemigo se defiende! Sacó un ", valorDadoEnemigo, ", reduce el ", (valorDadoEnemigo - 1) * 20, "% del daño recibido";
+							danioRecibidoEnemigo <- trunc((valorDadoPersonaje - 1) * 20 / 100);
+						FinSi
+						Si danioRecibidoEnemigo = 100 Y danioAlEnemigo = 200 Entonces
+							Escribir "El enemigo bloquea el ataque pero consigues atravesar su defensa! Le haces ", (danioAlEnemigo / 2), " de daño";
+						SiNo
+							Si danioRecibidoEnemigo = 100 Entonces
+								Escribir "El enemigo consigue bloquear completamente el ataque";
+							SiNo
+								Escribir "Le diste! Sacó un ", valorDadoEnemigo, ", le haces el ", (valorDadoEnemigo - 1) * 20, "% de tu daño";
+								danioAlEnemigo <- trunc((fuerzaPersonaje * danioAlEnemigo / 100) * ((100 - danioRecibidoEnemigo) / 100));
+								vidaEnemigo <- vidaEnemigo - danioAlEnemigo;
+								Escribir "Le hiciste ", danioAlEnemigo, " de daño al enemigo";
+							FinSi
+						FinSi
+					FinSi
+				FinSi
+			FinSi
+			Si eleccionNumero = 2 Y valorDadoEnemigo = 1 Entonces
+				valorDadoEnemigo <- lanzarDadoAnimacion;
+				Si valorDadoEnemigo = 1 Entonces
+					Escribir "Se tropieza y se ataca solo";
+					Escribir "Se hace ", fueraEnemigo * 10 / 100, " de daño";
+					vidaEnemigo <- vidaEnemigo - (fueraEnemigo * 10 / 100);
+				SiNo
+					Si valorDadoEnemigo < 3 Entonces 
+						Escribir "Falló! Sacó un ", valorDadoEnemigo;
+					SiNo
+						Escribir "Se te acerca para acertarte";
+						Si eleccionNumero = 2 Entonces
+							valorDadoPersonaje <- lanzarDadoAnimacion;
+							Si valorDadoPersonaje < 3 Entonces 
+								Escribir "Defensa fallida! Quedas al descubierto, sacaste un ", valorDadoPersonaje;
+							SiNo
+								Escribir "Defensa exitosa! Sacaste un ", valorDadoPersonaje, ", reduces el ", (valorDadoPersonaje - 1) * 20, "% del daño recibido";
+								danioRecibidoPersonaje <- (valorDadoPersonaje - 1) * 20 / 100;
+							FinSi
+							Si danioRecibidoPersonaje = 100 Entonces
+								Escribir "Bloqueaste completamente el ataque!";
+							SiNo
+								Escribir "Te dió! Sacó un ", valorDadoEnemigo, ", te hace el ", (valorDadoEnemigo - 1) * 20, "% de su daño";
+								danioRecibidoPersonaje <- trunc((fuerzaEnemigo * ((valorDadoEnemigo - 1) * 20 / 100)) * (100 - danioRecibidoPersonaje) / 100 );
+								Escribir "Recibes ", danioRecibidoPersonaje, " de daño!";
+								vidaPersonaje <- vidaPersonaje - danioRecibidoPersonaje;
+							FinSi
+						FinSi
+					FinSi
+				FinSi
+			FinSi
+		FinSi
+	FinMientras
+	Si vidaPersonaje <= 0 Entonces
+		Escribir "El enemigo te mató!";
+		Escribir "Por la gracia del dios te da una nueva oportunidad y te revive";
+		Escribir "El enemigo al ver que te levantas nuevamente, huye";
+	SiNo
+		Escribir "¡Has derrotado al enemigo!";
+		Escribir "Luego de una larga batalla descansas y te recuperas";
+	FinSi
+	vidaPersonaje <- vidaMaximaPersonaje;
+	Esperar 2 Segundos;
 FinSubProceso
 
 
@@ -468,14 +581,14 @@ SubProceso escrituraMensaje(mensaje, tamanio)
     Escribir " |";
 FinSubProceso
 
-Subproceso mostrarMensaje_ingresarNombre
+Subproceso mostrarMensajeIngresarNombre
     Definir mensaje Como Caracter;
     mensaje <-                    "Ingrese el nombre de su personaje     ";
     mensaje <- Concatenar(mensaje,"para comenzar"                         );
     mostrarMensaje(mensaje);
 FinSubProceso
 
-Subproceso mostrarMensaje_accionesMapa(estado)
+Subproceso mostrarMensajeAccionesMapa(estado)
     Definir mensaje Como Caracter;
     mensaje <- "";
     Si estado = "0001" Entonces
@@ -494,7 +607,17 @@ Subproceso mostrarMensaje_accionesMapa(estado)
     mostrarMensaje(mensaje);
 FinSubProceso
 
-Subproceso mostrarMensaje_menuInicio(estado)
+Subproceso mostrarMensajeAccionesPelea
+    Definir mensaje Como Caracter;
+    mensaje <- "";
+    mensaje <- Concatenar(mensaje," Ingrese una acción:                     ");
+    mensaje <- Concatenar(mensaje,"               (E) Stats                 ");
+    mensaje <- Concatenar(mensaje,"    Atacar (A)     (D) Defender          ");
+    mensaje <- Concatenar(mensaje,"                                         ");
+    mostrarMensaje(mensaje);
+FinSubProceso
+
+Subproceso mostrarMensajeMenuInicio(estado)
     ilustracionMenu();
     Definir mensaje Como Caracter;
     mensaje <- "";
@@ -506,19 +629,19 @@ Subproceso mostrarMensaje_menuInicio(estado)
     mostrarMensaje(mensaje);
 FinSubProceso
 
-SubProceso mostrarMensaje_estadisticasPersonaje(nombre, vida, experiencia, fuerza, defensa, agilidad, inteligencia, nivel, estado)
+SubProceso mostrarMensajeEstadisticasPersonaje(nombrePersonaje, vidaPersonaje, experienciaPersonaje, fuerzaPersonaje, defensaPersonaje, agilidadPersonaje, inteligenciaPersonaje, nivelPersonaje, estadoPersonaje)
     Definir mensaje, aux Como Caracter;
     Dimension mensaje[10];
     mensaje[0] <- "DATOS PERSONAJE";
-    mensaje[1] <- Mayusculas(nombre);
-    mensaje[2] <- Concatenar("Vida: ", ConvertirATexto(vida));
-    mensaje[3] <- Concatenar("Experiencia: ", ConvertirATexto(experiencia));
-    mensaje[4] <- Concatenar("Fuerza: ", ConvertirATexto(fuerza));
-    mensaje[5] <- Concatenar("Defensa: ", ConvertirATexto(defensa));
-    mensaje[6] <- Concatenar("Agilidad: ", ConvertirATexto(agilidad));
-    mensaje[7] <- Concatenar("Inteligencia: ", ConvertirATexto(inteligencia));
-    mensaje[8] <- Concatenar("Nivel: ", ConvertirATexto(nivel));
-    mensaje[9] <- Concatenar("Estado: ", estado);
+    mensaje[1] <- Mayusculas(nombrePersonaje);
+    mensaje[2] <- Concatenar("Vida: ", ConvertirATexto(vidaPersonaje));
+    mensaje[3] <- Concatenar("Experiencia: ", ConvertirATexto(experienciaPersonaje));
+    mensaje[4] <- Concatenar("Fuerza: ", ConvertirATexto(fuerzaPersonaje));
+    mensaje[5] <- Concatenar("Defensa: ", ConvertirATexto(defensaPersonaje));
+    mensaje[6] <- Concatenar("Agilidad: ", ConvertirATexto(agilidadPersonaje));
+    mensaje[7] <- Concatenar("Inteligencia: ", ConvertirATexto(inteligenciaPersonaje));
+    mensaje[8] <- Concatenar("Nivel: ", ConvertirATexto(nivelPersonaje));
+    mensaje[9] <- Concatenar("Estado: ", estadoPersonaje);
     mostrarMensajes(mensaje, 10);
 FinSubProceso
 
@@ -710,9 +833,9 @@ FinSubProceso
 SubProceso BuscaHongos
 	
 	Dimension num[9,9];Dimension fan[9,9];
-	Definir num,fan,mina_pisada,num_minas_car, opcion_letra como caracter;
+	Definir num,fan,minaPisada,numeroMinasCaracter, opcionLetra como caracter;
 	Definir salir,retirada como caracter;
-	Definir num_minas,op,fil,col,i,j,xe,ye,verificar,varX,varY,busX,busY,marX,marY,nivel,opc, cantidadMuertes como Entero;
+	Definir numeroMinas,op,fil,col,i,j,xe,ye,verificar,varX,varY,busX,busY,marX,marY,nivel,opc, cantidadMuertes como Entero;
 	Definir juegoHongos Como Logico;
 	juegoHongos <- Verdadero;
 	retirada<-'';
@@ -726,7 +849,7 @@ SubProceso BuscaHongos
 		Escribir "***  PARA PASAR AL PRÓXIMO DEBERÁS PASAR POR UN CAMPO DE HONGOS  ***";
 		Escribir "************** PRESIONE CUALQUIER TECLA PARA CONTINUAR **************";
 		Escribir "********************************************************************";
-		Leer opcion_letra;
+		Leer opcionLetra;
 		
 		
 		Repetir
@@ -748,7 +871,7 @@ SubProceso BuscaHongos
 			FinSegun
 		Hasta Que opc>=1 y opc<=3
 		
-		num_minas<-0;
+		numeroMinas<-0;
 		op<-1;
 		para fil<-0 hasta 7 con paso 1 hacer
 			Para col<-0 Hasta 7 Con Paso 1 Hacer
@@ -806,9 +929,9 @@ SubProceso BuscaHongos
 			Leer varY;
 			
 			si varX>=1 y varY>=1 y varX<=7 y varY<=7 entonces
-				mina_pisada<-num[varY,varX];
+				minaPisada<-num[varY,varX];
 				
-				si !mina_pisada="X" entonces
+				si !minaPisada="X" entonces
 					
 					Repetir					
 						busX<-varX;
@@ -835,14 +958,14 @@ SubProceso BuscaHongos
 						FinSegun
 						op<-op+1;
 						si num[busY,busX]='X' Entonces
-							num_minas <- num_minas+1;
+							numeroMinas <- numeroMinas+1;
 						FinSi
 						
 						
 					Hasta Que op=9
-					num_minas_car<-ConvertirATexto(num_minas);
-					fan[varY,varX]<- num_minas_car;
-					op<-1;num_minas<-0;
+					numeroMinas_car<-ConvertirATexto(numeroMinas);
+					fan[varY,varX]<- numeroMinasCaracter;
+					op<-1;numeroMinas<-0;
 				Sino
 					LimpiarPantalla;
 					Escribir "       1   2   3   4   5   6   ";
@@ -979,9 +1102,6 @@ SubProceso alea <- lanzarDadoAnimacion
     // Inicio de la simulación
     alea <- lanzarDado(1,6);
     
-    Escribir "Presione Enter para lanzar el dado, veamos tu suerte!!!...";
-    Leer altura; // Simula la presión de un botón
-    
     contador <- 0 ;// Contador para alternar entre cubos
     
     // Movimiento del dado hacia abajo y arriba
@@ -1063,11 +1183,7 @@ SubProceso alea <- lanzarDadoAnimacion
             Para j <- 1 Hasta 7 Hacer
                 Escribir cubox6[j];
             FinPara
-    FinSegun
-    
-	Escribir "Magicamente el dado a salido en ", alea;
-    Escribir "La suerte te sonrie!!! por ahora.";
-	
+    FinSegun	
 FinSubProceso
 
 SubProceso animacionCierre
@@ -1516,7 +1632,7 @@ SubProceso pantallaEleccionJuego
 	Escribir "*                                                                    *";
 	Escribir "**********************************************************************";
 	Escribir "*                                                                    *";
-	Escribir "*                          1. Laberinto                              *";
+	Escribir "*                          1. Laberinto del Dragón                   *";
 	Escribir "*                          2. Buscaminas                             *";
 	Escribir "*                          3. Salir                                  *";
 	Escribir "*                                                                    *";
@@ -1527,7 +1643,7 @@ SubProceso pantallaEleccionJuego
 	
 	Segun opcion Hacer
 		Caso 1:
-			juego;
+			juegoLaberinto;
 		Caso 2:
 			Escribir "Cargando Buscaminas...";			
 		Caso 3:
@@ -1535,7 +1651,6 @@ SubProceso pantallaEleccionJuego
 			
 		De Otro Modo:
 			Escribir "Opción no válida. Por favor, ingrese una opción correcta.";
-			estadoMenu <- "0001";
 			Esperar 3 Segundos;
 			Borrar Pantalla;
 			pantallaEleccionJuego();

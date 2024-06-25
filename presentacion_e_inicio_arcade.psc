@@ -1,4 +1,4 @@
-Proceso PresentacionEInicioArcade
+SubProceso PresentacionEInicioArcade
 	definir matrizEspacial, textoArcadeDaVinci Como Caracter;
 	definir tam como entero;
 	Dimension  matrizEspacial(30,30);
@@ -17,10 +17,10 @@ Proceso PresentacionEInicioArcade
 	Esperar Tecla;
 	Borrar Pantalla;
 	pantallaEleccionJuego();
-FinProceso
+FinSubProceso
 
 //subproceso utilizado para generar una matriz simulando un espacio de "estrellas"
-subproceso rellenarMatrizEspacial(tam, matrizEspacial)
+SubProceso rellenarMatrizEspacial(tam, matrizEspacial)
 	definir i, j Como Entero;
 	para i <- 0 hasta tam-1 Hacer
 		Para j <- 0 Hasta  tam-1 Hacer
