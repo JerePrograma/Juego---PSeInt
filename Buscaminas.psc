@@ -982,8 +982,8 @@ FinSubProceso
 
 
 
-Proceso Principal
+SubProceso juegoBuscaminas
 	Definir a Como Entero;
 	a <- 0;
 	buscaMinas(a);
-FinProceso
+FinSubProceso
