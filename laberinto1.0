@@ -113,7 +113,7 @@ SubProceso inicializarLaberinto(tam, laberinto)
     laberinto((tamLaberinto-1),(tamLaberinto-1)-1) <- " ";
     laberinto((tamLaberinto-1)-1,(tamLaberinto-1)) <- " ";
     laberinto((tamLaberinto-1)-1,(tamLaberinto-1)-1) <- " ";
-    
+    laberinto(tam-1,tam-1) <- "[";
     poblarLaberintoEnemigos(tamLaberinto, laberinto);
 	Borrar Pantalla;
 FinSubProceso
@@ -482,7 +482,7 @@ SubProceso pelea(nombrePersonaje, vidaPersonaje Por Referencia, experienciaPerso
 									danioAlEnemigo <- fuerzaPersonaje * 2;
 								SiNo
 									Escribir "Lo atacas! Sacaste un ", valorDadoPersonaje, ", le haces el ", (valorDadoPersonaje - 1) * 20, "% de tu daño";
-									danioAlEnemigo <- fuerzaPersonaje * redon(((valorDadoPersonaje - 1) * 20 / 100));
+									danioAlEnemigo <- redon(fuerzaPersonaje * ((valorDadoPersonaje - 1) * 20 / 100));
 									Esperar 2 Segundos;
 								FinSi
 								valorDadoEnemigo <- lanzarDadoAnimacion;
@@ -499,7 +499,7 @@ SubProceso pelea(nombrePersonaje, vidaPersonaje Por Referencia, experienciaPerso
 											Escribir "El enemigo bloquea completamente el ataque! No le haces daño";
 										SiNo
 											Escribir "El enemigo se defiende! Sacó un ", valorDadoEnemigo, ", reduce el ", (valorDadoEnemigo - 1) * 20, "% del daño recibido";
-											danioRecibidoEnemigo <- redon(danioAlEnemigo * (valorDadoEnemigo - 1) * 20 / 100);
+											danioRecibidoEnemigo <- redon(danioAlEnemigo * (100 - (valorDadoEnemigo - 1) * 20) / 100);
 											Escribir "Le hiciste ", danioAlEnemigo, " de daño al enemigo";
 										FinSi
 									FinSi									
@@ -2276,6 +2276,8 @@ SubProceso Exploracion(matrizAtras Por Referencia, matrizCortina Por Referencia,
             FinSi
         FinSi        
     Hasta Que gano = Verdadero o perdio = Verdadero;
+	
+	animacionCierre;
 FinSubProceso 
 
 //Este algoritmo es para que el jugador ingrese o quite una bandera
