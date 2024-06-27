@@ -440,7 +440,7 @@ SubProceso pelea(nombrePersonaje, vidaPersonaje Por Referencia, experienciaPerso
 				FinSi
 				vidaEnemigo <- vidaEnemigo - danioAlEnemigo;
 				Escribir "Le hiciste ", danioAlEnemigo, " de daño al enemigo";
-				Esperar 2 Segundos;
+				Esperar 3 Segundos;
 				Escribir "El enemigo te ataca!";
 				valorDadoEnemigo <- lanzarDadoAnimacion;
 				Si valorDadoEnemigo = 1 Entonces
@@ -488,6 +488,7 @@ SubProceso pelea(nombrePersonaje, vidaPersonaje Por Referencia, experienciaPerso
 								valorDadoEnemigo <- lanzarDadoAnimacion;
 								Si valorDadoEnemigo < 3 Entonces 
 									Escribir "El enemigo no se defiende! Queda al descubierto, sacó un ", valorDadoEnemigo;
+									Escribir "Le haces ", danioAlEnemigo, " de daño";
 									danioRecibidoEnemigo <- danioAlEnemigo;
 								SiNo
 									Si valorDadoEnemigo = 6 Y valorDadoPersonaje = 6 Entonces
@@ -709,7 +710,7 @@ SubProceso mostrarLaberinto(tam, laberinto)
     Definir fila, columna Como Entero;
     Para fila <- 0 Hasta tam-1 Hacer
         Para columna <- 0 Hasta tam-1 Hacer
-            Escribir "[", laberinto(fila, columna), "] " Sin Saltar;
+            Escribir " ", laberinto(fila, columna), " " Sin Saltar;
         FinPara
         Escribir " ";
     FinPara
@@ -2277,7 +2278,6 @@ SubProceso Exploracion(matrizAtras Por Referencia, matrizCortina Por Referencia,
         FinSi        
     Hasta Que gano = Verdadero o perdio = Verdadero;
 	
-	animacionCierre;
 FinSubProceso 
 
 //Este algoritmo es para que el jugador ingrese o quite una bandera
@@ -2702,7 +2702,6 @@ SubProceso buscaMinas(nada)//Con un argumento vacio funciona
 			Leer num;
 		Hasta Que num = 1 o num = 2
 		Segun num Hacer
-			
 			1:
 				jugarOtraVez <- Verdadero;
 			2:
@@ -2710,6 +2709,7 @@ SubProceso buscaMinas(nada)//Con un argumento vacio funciona
 		FinSegun		
 		Limpiar Pantalla;
 	Hasta Que jugarOtraVez = Falso
+	animacionCierre;
 FinSubProceso
 
 SubProceso juegoBuscaminas
